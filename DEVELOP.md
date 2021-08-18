@@ -1,6 +1,6 @@
 # Developing the bridge
 
-## Local Devnet
+## Local Devnet Overview
 
 The following dependencies are required for local development:
 
@@ -75,6 +75,35 @@ To Solana as CPI instruction:
 
     kubectl exec solana-devnet-0 -c setup -- client post-message --proxy CP1co2QMMoDPbsmV7PGcUTLFwyhgCgTXt25gLQ5LewE1 Bridge1p5gheXUvJ6jGWGeCsgPKgnE3YgdGKRVCMY9o 1 confirmed ffff
 
+## Devnet using the default nix scripts
+
+### Prerequisites
+
+- Install nix
+- Install docker (containerd and docker cli, other providers might work too)
+- Install kvm and libvirt
+```
+# steps for arch linux, ubuntu is probably different and probably has the bridge network preconfigured
+sudo pacman -S qemu-headless
+sudo pacman -S libvirt
+sudo useradd -aG libvirt $USER
+sudo systemctl enable libvirtd libvirt-guests
+sudo pacman -Syu ebtables dnsmasq
+sudo systemctl restart libvirtd
+sudo virsh net-define /etc/libvirt/qemu/networks/default.xml
+sudo virsh net-autostart default
+sudo virsh net-start default
+```
+
+### Usage
+
+```
+# in the root of the repository
+nix-shell # installs the dependencies needed to start (as long as prerequisite daemons above are installed)
+./generate-wasm.sh # build wasm packages (todo: fix this so that it's done as a part of the container build)
+whcluster # starts minikube
+whtilt # deploys to the minikube cluster
+```
 
 ## IntelliJ Protobuf Autocompletion
 
